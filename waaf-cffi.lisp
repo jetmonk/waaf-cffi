@@ -79,7 +79,7 @@ jurisdiciton.  See LICENSE.txt.
 ;; pointer.  The only ones in this code are things like +LISP-INT-TYPE+
 ;; which is used to coerce lisp values so they can be put into foreign
 ;; memory of type :INT
-(eval-when (:load-toplevel :compile-toplevel)
+(eval-when (:load-toplevel :compile-toplevel :execute)
   (when (not (boundp '+lisp-int-type+)) ;; don't rebind defconstant; SBCL complains
     (progn
 
@@ -89,13 +89,14 @@ jurisdiciton.  See LICENSE.txt.
 	      ((= 8 (cffi:foreign-type-size :int))
 	       '(signed-byte 64))
 	      (t (error "Failed type lisp-int-type"))))
+      
       (defconstant +lisp-uint-type+ 
 	(cond ((= 4 (cffi:foreign-type-size :unsigned-int))
 	       '(unsigned-byte 32))
 	      ((= 8 (cffi:foreign-type-size :unsigned-int))
 	       '(unsigned-byte 64))
 	      (t (error "Failed type lisp-uint-type"))))
-      (defconstant +lisp-unsigned-int-type+  +lisp-uint-type+)
+
 
       (defconstant +lisp-pointer-type+  
 	(cond ((= 4 (cffi:foreign-type-size :pointer))
@@ -120,7 +121,6 @@ jurisdiciton.  See LICENSE.txt.
 	(cond ((= 1 (cffi:foreign-type-size :uchar))
 	       '(unsigned-byte 8))
 	      (t (error "Failed type lisp-uchar-type")))) 
-      (defconstant +lisp-unsigned-char-type+ +lisp-uchar-type+)
       
       (defconstant +lisp-short-type+
 	(cond ((= 2 (cffi:foreign-type-size :short))
@@ -130,7 +130,7 @@ jurisdiciton.  See LICENSE.txt.
 	(cond ((= 2 (cffi:foreign-type-size :ushort))
 	       '(unsigned-byte 16))
 	      (t (error "Failed type lisp-ushort-type"))))
-      (defconstant +lisp-unsigned-short-type+ +lisp-ushort-type+)
+
       
       (defconstant +lisp-long-type+ 
 	(cond ((= 4 (cffi:foreign-type-size :long))
@@ -144,7 +144,6 @@ jurisdiciton.  See LICENSE.txt.
 	      ((= 8 (cffi:foreign-type-size :ulong))
 	       '(unsigned-byte 64))
 	      (t (error "Failed type lisp-ulong-type"))))
-      (defconstant +lisp-unsigned-long-type+ +lisp-ulong-type+)
       ;;
       (defconstant +lisp-llong-type+ 
 	(cond ((= 4 (cffi:foreign-type-size :llong))
@@ -158,15 +157,30 @@ jurisdiciton.  See LICENSE.txt.
 	      ((= 8 (cffi:foreign-type-size :ullong))
 	       '(unsigned-byte 64))
 	      (t (error "Failed type lisp-ullong-type"))))
-      (defconstant +lisp-unsigned-long-long-type+ +lisp-ullong-type+)
+      
 
-      ;; this is a potentially hazardous guess.  The reasoning
-      ;; is that a size_t will be the biggest integer type, which
-      ;; will also be a pointer.
-      (defconstant +lisp-size_t-type+ +lisp-pointer-type+)
+      ;;
+      )))
+
+
+;; some additional synonyms - sometimes SBCL requires these in separate block, like here
+(eval-when (:load-toplevel :compile-toplevel :execute)
+  (when (not (boundp '+lisp-unsigned-int-type+))
+    (defconstant +lisp-unsigned-int-type+  +lisp-uint-type+)
+    (defconstant +lisp-unsigned-long-type+ +lisp-ulong-type+)
+    (defconstant +lisp-unsigned-long-long-type+ +lisp-ullong-type+)
+    (defconstant +lisp-unsigned-short-type+ +lisp-ushort-type+)
+    (defconstant +lisp-unsigned-char-type+ +lisp-uchar-type+)
+    
+    ;; this is a potentially hazardous guess.  The reasoning
+    ;; is that a size_t will be the biggest integer type, which
+    ;; will also be a pointer.
+    (defconstant +lisp-size_t-type+ +lisp-pointer-type+)))
       
-      
-      ;; types to tell the user the Lisp equivalnt of various 
+
+    
+(eval-when (:load-toplevel :compile-toplevel :execute)
+        ;; types to tell the user the Lisp equivalnt of various 
       ;; foreign ("machine") types.
       (deftype machine-size_t              ()  +lisp-pointer-type+) 
       (deftype machine-uint                ()     +lisp-uint-type+)
@@ -183,13 +197,8 @@ jurisdiciton.  See LICENSE.txt.
       (deftype machine-ulong               ()    +lisp-ulong-type+)
       (deftype machine-llong               ()    +lisp-llong-type+)
       (deftype machine-ullong              ()   +lisp-ullong-type+)
-      (deftype machine-unsigned-long-long  ()   +lisp-ullong-type+)
-      ;;
-      )))
-
-  
+      (deftype machine-unsigned-long-long  ()   +lisp-ullong-type+))
     
-  
   
  
 
